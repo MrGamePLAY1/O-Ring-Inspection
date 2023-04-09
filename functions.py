@@ -3,8 +3,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import glob
+import sys
 
-path = 'images/'
+path = 'images/original/'
+grey_path = 'images/grey_images/'
 
 
 def read_images(path):
@@ -12,9 +15,9 @@ def read_images(path):
     for i in os.listdir(path):
         if i.endswith('.jpg') or i.endswith('.png'):
             img = cv.imread(os.path.join(path, i))
-            # cv.imshow('Original Images', img)
-            # cv.waitKey(0)
-            # cv.destroyAllWindows()
+            cv.imshow('Original Images', img)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
 
         # if Q is pressed, the program skip to next image
         if 0xff == ord('q'):
@@ -23,12 +26,28 @@ def read_images(path):
     return img
 
 
+def grey_image():
+    # This creates all grey images in a new folder
+    count = 0
+
+    for name in os.listdir(path):
+        count += 1
+        print(count)
+        img = cv.imread(path + name)
+        grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+
+        # Writing new images to a new folder
+        cv.imwrite('images/grey_images/grey_image{}.jpg'.format(count), grey)
+
+
+
 def oring_historgram():
     # histogram of o-rings
     for name in os.listdir(path):
         img = cv.imread(path + name)
         grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        cv.imshow('images bud', grey)
+        cv.imshow('Grey Image', grey)
         cv.waitKey(0)
         cv.destroyAllWindows()
 
@@ -55,13 +74,14 @@ def getAverageGrey(img):
 
     return average_values
 
+
 def centerOfCircle(img):
     # This returns the center of a circle and places a red dot on it
     dimensions = img.shape
     width = dimensions[0]
     height = dimensions[1]
     halfWidth = width / 2
-    halfHeight = height/ 2
+    halfHeight = height / 2
 
     # Draw a red dot in the center of the image
     cv.circle(img, (int(halfWidth), int(halfHeight)), 2, (0, 0, 255), -1)
@@ -69,8 +89,9 @@ def centerOfCircle(img):
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-
     # Erosion
+
+
 def erosion():
     for name in os.listdir(path):
         img = cv.imread(path + name)
@@ -89,3 +110,23 @@ def dilation():
         cv.imshow('Dilation', img_dilation)
         cv.waitKey(0)
         cv.destroyAllWindows()
+
+
+# Adaptive Thresholding
+def adaptiveThresh(img):
+    # This function returns the thresholded image
+    for name in os.listdir(path):
+        img = cv.imread(path + name)
+
+        grey = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        threshold = cv.adaptiveThreshold(grey, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 15)
+        # cv.imshow('Loop of images', threshold)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+
+        print('Managed to complete the thresholding')
+        plt.imshow(threshold, cmap='gray')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.show()
+
